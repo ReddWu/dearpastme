@@ -47,12 +47,13 @@ function todayLabel() {
 }
 
 export function JournalComposer({
-  marks: _marks,
+  marks,
   initialRecipient = 'all',
 }: {
   marks: MarkSummary[];
   initialRecipient?: Recipient;
 }) {
+  void marks;
   const formRef = useRef<HTMLFormElement | null>(null);
   const [recipient, setRecipient] = useState<Recipient>(initialRecipient);
   const [weather, setWeather] = useState<Weather | null>(null);
@@ -118,7 +119,7 @@ export function JournalComposer({
         name="content"
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Today…"
+        placeholder="What happened today?"
         autoFocus
         maxLength={6000}
         className="min-h-[28rem] w-full resize-y bg-transparent border-0 outline-none text-ink/95 font-serif text-xl leading-loose placeholder:text-ash/30 placeholder:italic"
@@ -148,7 +149,7 @@ export function JournalComposer({
         <div className="flex items-center justify-between gap-6">
           <p className="text-xs italic text-ash/70">
             {savedAt && !isPending
-              ? 'Page kept. The room may answer, or it may not.'
+              ? 'Saved. Whether it answers is another question.'
               : 'Nothing here is public. Nothing here trains anything.'}
           </p>
           <div className="flex items-center gap-6">
@@ -158,7 +159,7 @@ export function JournalComposer({
               disabled={isPending || content.trim().length < 12}
               className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink disabled:opacity-30 disabled:hover:text-ash transition-colors duration-700"
             >
-              {isPending ? 'Keeping it…' : 'Send page →'}
+              {isPending ? 'Saving…' : 'Leave this page here'}
             </button>
           </div>
         </div>

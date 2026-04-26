@@ -10,13 +10,13 @@ If you're not sure about a section, infer from the strongest signal you can obse
 [The Current You]
 Three sentences describing this person's life right now. Include: what they're doing, who they're connected to, the inner motif.
 
-[Inertia]
+[If Nothing Changes]
 If this person makes no active changes and continues on the current track, what's most likely to happen in the next five to ten years? Three concrete details that can be pictured.
 
-[The Thing You Keep Wanting To Do]
+[The Thing You Keep Putting Off]
 The one thing this person keeps bringing up, circling around, finding reasons to delay. Just one — the biggest one.
 
-[Passive Mode]
+[Where You Stop Choosing]
 In what areas does this person "neither actively choose nor actively refuse"? List two or three concrete domains (love, career, family, health, geography), and how they show up in each.
 
 [What You Think About Late At Night]
@@ -34,10 +34,9 @@ export default function ProfileImportPage() {
   return (
     <Stage align="top" width="wide">
       <Caption>Step Three</Caption>
-      <Headline>Bring back a profile of you.</Headline>
+      <Headline>Now let&apos;s build a profile of who you are.</Headline>
       <Whisper>
-        Ask the AI that knows you best to write this profile, or skip that step
-        and answer the seven questions yourself.
+        You can ask an AI that knows you well, or answer the questions yourself.
       </Whisper>
       <ImportForm prompt={LLM_PROMPT} />
     </Stage>

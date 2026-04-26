@@ -14,39 +14,45 @@ const VERSE_MS = 3200;
 const QUESTIONS: { key: keyof Profile; label: string; placeholder: string; rows: number }[] = [
   {
     key: 'current_self',
-    label: 'The Current You',
+    label: 'Your Life Right Now',
     placeholder: 'What does your life look like right now? What are you doing, who are you connected to, and what is the inner motif?',
     rows: 4,
   },
   {
     key: 'inertia',
-    label: 'Inertia',
+    label: 'If Nothing Changes',
     placeholder: 'If nothing changes, what is most likely to happen over the next five to ten years? Use concrete details.',
     rows: 4,
   },
   {
     key: 'the_thing',
-    label: 'The Thing You Keep Wanting To Do',
+    label: 'The Thing You Keep Putting Off',
     placeholder: 'What is the one thing you keep circling and delaying?',
     rows: 3,
   },
   {
     key: 'passive_mode',
-    label: 'Passive Mode',
-    placeholder: 'Where do you neither actively choose nor actively refuse? Career, love, family, health, geography?',
+    label: 'Where You Stop Choosing',
+    placeholder: 'Where do you stop actively choosing? Career, love, family, health, geography?',
     rows: 4,
   },
   {
     key: 'late_night_scene',
-    label: 'What You Think About Late At Night',
+    label: 'What Comes Back at Night',
     placeholder: 'At 4 AM, what specific scene, person, or image comes back?',
     rows: 4,
   },
   {
     key: 'unspoken_desire',
-    label: 'The Unspoken Want',
+    label: 'The Want You Rarely Admit',
     placeholder: 'What do you want but have trouble admitting out loud?',
     rows: 3,
+  },
+  {
+    key: 'interests',
+    label: 'The Things You Reach For',
+    placeholder: 'What do you actually reach for when no one is watching? Music, food, places, books, internet rabbit holes, sports, neighborhoods, anything concrete.',
+    rows: 4,
   },
 ];
 
@@ -122,7 +128,7 @@ export function ImportForm({ prompt }: { prompt: string }) {
             mode === 'answer' ? 'text-ink border border-ash/30' : 'text-ash hover:text-ink'
           }`}
         >
-          Answer Six Questions
+          Answer the Questions
         </button>
       </div>
 
@@ -133,7 +139,7 @@ export function ImportForm({ prompt }: { prompt: string }) {
               <div>
                 <p className="text-[0.65rem] tracking-[0.3em] uppercase text-ash">Prompt</p>
                 <p className="mt-2 text-sm text-ash/80 italic">
-                  Paste this into the AI that knows you best.
+                  Paste this into the AI you talk to most.
                 </p>
               </div>
               <button
@@ -160,9 +166,9 @@ export function ImportForm({ prompt }: { prompt: string }) {
 
           <div className="flex flex-col gap-5">
             <div>
-              <p className="text-[0.65rem] tracking-[0.3em] uppercase text-ash">Profile reply</p>
+              <p className="text-[0.65rem] tracking-[0.3em] uppercase text-ash">AI response</p>
               <p className="mt-2 text-sm text-ash/80 italic">
-                Paste the AI&apos;s full reply here.
+                Paste the full response here.
               </p>
             </div>
             <textarea
@@ -179,7 +185,7 @@ export function ImportForm({ prompt }: { prompt: string }) {
                 disabled={isPending}
                 className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink disabled:opacity-30 disabled:hover:text-ash transition-colors duration-700"
               >
-                {isPending ? 'Reading...' : 'Read me.'}
+                {isPending ? 'Reading...' : 'Use this profile'}
               </button>
             </div>
           </div>

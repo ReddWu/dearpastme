@@ -5,8 +5,8 @@ export default function VoicePage() {
   return (
     <Stage>
       <Caption>Step Two</Caption>
-      <Headline>Now, lend me a piece of your voice.</Headline>
-      <Whisper>The future you will speak to you in this voice.</Whisper>
+      <Headline>Now let&apos;s hear your voice.</Headline>
+      <Whisper>What might your voice sound like in the future?</Whisper>
       <VoiceRecorder />
     </Stage>
   );

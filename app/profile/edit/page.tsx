@@ -26,8 +26,8 @@ export default async function ProfileEditPage() {
   return (
     <Stage align="top" width="wide">
       <Caption>Step Four</Caption>
-      <Headline>Is this you?</Headline>
-      <Whisper>If a line doesn&apos;t fit, change it. The three futures grow from these seven.</Whisper>
+      <Headline>Does this feel like you?</Headline>
+      <Whisper>Change anything that feels off. The future grows from what is true.</Whisper>
       <ProfileEditor initial={profile} />
     </Stage>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { setMarks } from '@/app/actions/marks';
 import type { Branch } from '@/lib/types';
 import { BRANCH_LABEL } from '@/lib/types';
@@ -19,18 +19,14 @@ export function MarkPicker({ futures }: { futures: Card[] }) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // When the user picks (or changes) want_to_become, prefill the inline
-  // editor with that future's seed text. We don't reset their typed-in
-  // changes if they re-click the same card.
-  useEffect(() => {
-    if (!want) { setVisionText(''); return; }
-    const picked = futures.find((f) => f.id === want);
-    if (picked) setVisionText(picked.vision_seed);
-  }, [want, futures]);
-
   function pick(id: string, kind: 'want' | 'afraid') {
     if (kind === 'want') {
-      setWant((prev) => (prev === id ? null : id));
+      setWant((prev) => {
+        const next = prev === id ? null : id;
+        const picked = futures.find((f) => f.id === next);
+        setVisionText(picked?.vision_seed ?? '');
+        return next;
+      });
       if (afraid === id) setAfraid(null);
     } else {
       setAfraid((prev) => (prev === id ? null : id));
@@ -79,7 +75,7 @@ export function MarkPicker({ futures }: { futures: Card[] }) {
                     isWant ? 'border-ink text-ink' : 'border-ash/30 text-ash hover:text-ink hover:border-ink/40'
                   }`}
                 >
-                  Want to become
+                  I want this life
                 </button>
                 <button
                   type="button"
@@ -88,7 +84,7 @@ export function MarkPicker({ futures }: { futures: Card[] }) {
                     isAfraid ? 'border-ink text-ink' : 'border-ash/30 text-ash hover:text-ink hover:border-ink/40'
                   }`}
                 >
-                  Afraid of
+                  I fear this life
                 </button>
               </div>
             </div>
@@ -121,7 +117,7 @@ export function MarkPicker({ futures }: { futures: Card[] }) {
           disabled={isPending || (!want && !afraid)}
           className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink disabled:opacity-30 disabled:hover:text-ash transition-colors duration-700"
         >
-          {isPending ? 'Keeping it...' : 'Take me to my journal.'}
+          {isPending ? 'Saving...' : 'Take me to the journal'}
         </button>
       </div>
     </div>

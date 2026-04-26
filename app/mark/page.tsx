@@ -35,9 +35,9 @@ export default async function MarkPage() {
 
   return (
     <Stage align="top" width="wide">
-      <Caption>Step Six</Caption>
-      <Headline>Which one do you want to become?</Headline>
-      <Whisper>Which one are you afraid of? Pick both, or only one.</Whisper>
+      <Caption>Step Five</Caption>
+      <Headline>Which future pulls you in?</Headline>
+      <Whisper>Which one do you want? Which one unsettles you? You can choose both.</Whisper>
       <MarkPicker futures={cards} />
     </Stage>
   );

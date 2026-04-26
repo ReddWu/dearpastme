@@ -10,7 +10,7 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: "Dear Past Me",
-  description: "Some letters take ten years to arrive.",
+  description: "Meet a few possible versions of your future self.",
 };
 
 export default function RootLayout({

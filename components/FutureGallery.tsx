@@ -95,7 +95,7 @@ export function FutureGallery({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   <span className="absolute left-4 top-4 text-[0.55rem] tracking-[0.3em] uppercase text-vellum/85 border border-vellum/20 px-2 py-1 bg-black/20">
-                    Voice + Letter
+                    Voice + Story
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between">
@@ -139,7 +139,7 @@ export function FutureGallery({
           href="/mark"
           className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink transition-colors duration-700"
         >
-          I have seen them all.
+          I&apos;ve seen enough to choose
         </Link>
       </div>
 
@@ -316,7 +316,7 @@ function FutureDrawer({
               revealed ? 'opacity-100 text-ink' : 'opacity-30 text-ash'
             }`}
           >
-            {revealed ? future.voice_message_text : 'Press play. Hear them say it.'}
+            {revealed ? future.voice_message_text : 'Press play. Hear them speak.'}
           </p>
         </div>
       </div>

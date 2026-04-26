@@ -40,7 +40,7 @@ export function JournalReplyMail({ replies }: { replies: DeliveredReply[] }) {
       <div className="border border-dashed border-ash/15 p-6 text-center">
         <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ash mb-2">Inbox</p>
         <p className="text-sm italic text-ash/70 leading-loose">
-          No letters back yet. They arrive when they arrive.
+          No replies yet. They arrive when they arrive.
         </p>
       </div>
     );
@@ -51,7 +51,7 @@ export function JournalReplyMail({ replies }: { replies: DeliveredReply[] }) {
       <div className="flex items-baseline justify-between">
         <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ash">Inbox</p>
         <p className="text-[0.65rem] tracking-[0.3em] uppercase text-ash/60">
-          {replies.length} {replies.length === 1 ? 'letter' : 'letters'}
+          {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
         </p>
       </div>
       {replies.map((r) => <ReplyCard key={r.id} reply={r} />)}

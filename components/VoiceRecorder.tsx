@@ -4,15 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const RECITAL = [
-  'Read this aloud, slowly, in your normal voice — about a minute.',
+  'Say anything you want for about a minute.',
   '',
-  '"Today\'s me is leaving this voice for the you of ten years from now.',
-  'I don\'t know what city you\'ll be in, or who is still beside you.',
-  'I just want to say one thing, while I can still speak — ',
-  'that thing the two of us never got around to doing,',
-  'if you finally did it, I thank you on behalf of who I am today.',
-  'And if you didn\'t, that\'s all right too.',
-  'At least this voice has reached you."',
+  'What matters is that you speak clearly, naturally, and in your own voice.',
+  '',
+  'You could talk about the happiest thing that happened this week,',
+  'why you decided to try this website today,',
+  'or what your life feels like right now.',
 ];
 
 const TARGET_SECONDS = 60;
@@ -181,11 +179,11 @@ export function VoiceRecorder() {
               onClick={start}
               className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink transition-colors duration-700 border border-ash/30 hover:border-ink/40 px-10 py-4"
             >
-              Begin recording.
+              Start recording
             </button>
 
             <label className="cursor-pointer text-[0.65rem] tracking-[0.3em] uppercase text-ash hover:text-ink transition-colors duration-700">
-              Upload recording instead
+              Upload audio instead
               <input
                 type="file"
                 accept="audio/*"
@@ -207,7 +205,7 @@ export function VoiceRecorder() {
           <div className="flex flex-col items-center gap-6">
             <div className="text-3xl tracking-widest text-ink tabular-nums">{mm}:{ss}</div>
             <div className="text-xs tracking-[0.3em] uppercase text-ash">
-              Listening · stops automatically in {TARGET_SECONDS - seconds}s
+              Listening... stops automatically in {TARGET_SECONDS - seconds}s
             </div>
             <button
               type="button"
@@ -215,7 +213,7 @@ export function VoiceRecorder() {
               disabled={seconds < MIN_SECONDS}
               className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink disabled:opacity-30 disabled:hover:text-ash transition-colors duration-700"
             >
-              {seconds < MIN_SECONDS ? `${MIN_SECONDS - seconds}s more` : 'End recording.'}
+              {seconds < MIN_SECONDS ? `${MIN_SECONDS - seconds}s more` : 'Stop recording'}
             </button>
           </div>
         )}
@@ -229,18 +227,18 @@ export function VoiceRecorder() {
                 onClick={discard}
                 className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink transition-colors duration-700"
               >
-                Re-record.
+                Record again
               </button>
               <button
                 type="button"
                 onClick={submit}
                 className="text-[0.7rem] tracking-[0.4em] uppercase text-ink hover:text-vellum transition-colors duration-700"
               >
-                Send forward.
+                Use this recording
               </button>
             </div>
             <label className="cursor-pointer text-[0.65rem] tracking-[0.3em] uppercase text-ash hover:text-ink transition-colors duration-700">
-              Use a different file
+              Choose a different file
               <input
                 type="file"
                 accept="audio/*"
@@ -259,7 +257,7 @@ export function VoiceRecorder() {
         )}
 
         {state === 'uploading' && (
-          <p className="text-sm text-ash italic">Your voice is being kept. One moment...</p>
+          <p className="text-sm text-ash italic">Saving your voice...</p>
         )}
 
         {error && <p className="text-sm text-ash/80 italic">{error}</p>}

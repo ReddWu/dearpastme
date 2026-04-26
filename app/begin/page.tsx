@@ -5,16 +5,15 @@ export default function BeginPage() {
   return (
     <Stage>
       <Caption>Step One</Caption>
-      <Headline>First, lend me a recent photo of your face.</Headline>
+      <Headline>Pick a photo of yourself that feels most like you.</Headline>
       <Whisper>
-        Three future versions of you will grow out of this photograph.
+        Let&apos;s imagine what you might look like in the future.
       </Whisper>
 
       <BeginForm />
 
       <p className="text-xs text-ash/60 text-center fade-in-delayed mt-8 leading-loose">
-        Every word you write and every photo you send is never read, and never used for training.
-        They belong only to the future you.
+        Your words and photos stay private. They are never used for training.
       </p>
     </Stage>
   );

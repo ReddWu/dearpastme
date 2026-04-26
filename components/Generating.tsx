@@ -4,12 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const VERSES = [
-  'Three versions of you are walking toward this moment.',
-  'One of them already knows what you will do next year.',
-  'Another is the version you would rather not meet.',
-  'The third has stopped making choices.',
-  'They are coming into focus.',
-  'Stay — this time, they are the ones who speak first.',
+  'Three possible versions of you are coming into focus.',
+  'One carries the life you almost expect.',
+  'One carries the life you say you want.',
+  'One carries the life you never exactly chose.',
+  'Stay with them for a moment.',
+  'This time, they speak first.',
 ];
 
 const VERSE_MS = 5200; // each line lingers
@@ -89,7 +89,7 @@ export function Generating() {
         </div>
         {phase === 'done' && (
           <p className="text-[0.7rem] tracking-[0.4em] uppercase text-ash mt-4">
-            They are here.
+            They&apos;re here.
           </p>
         )}
         {phase === 'error' && (

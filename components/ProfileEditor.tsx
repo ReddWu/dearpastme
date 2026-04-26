@@ -5,12 +5,12 @@ import { saveProfile } from '@/app/actions/profile';
 import type { Profile } from '@/lib/types';
 
 const FIELDS: { key: keyof Profile; label: string; hint: string }[] = [
-  { key: 'current_self', label: 'The Current You', hint: 'How it sees the life you live now.' },
-  { key: 'inertia', label: 'Inertia', hint: 'Where it thinks you go if nothing changes.' },
-  { key: 'the_thing', label: 'The Thing You Keep Wanting To Do', hint: 'Just one — the biggest one.' },
-  { key: 'passive_mode', label: 'Passive Mode', hint: 'Where you let the world push you.' },
-  { key: 'late_night_scene', label: 'What You Think About Late At Night', hint: 'The image that surfaces at 4 AM.' },
-  { key: 'unspoken_desire', label: 'The Unspoken Want', hint: 'What your behavior reveals but your words deny.' },
+  { key: 'current_self', label: 'Your Life Right Now', hint: 'How it sees the life you live now.' },
+  { key: 'inertia', label: 'If Nothing Changes', hint: 'Where this path leads if nothing shifts.' },
+  { key: 'the_thing', label: 'The Thing You Keep Putting Off', hint: 'Just one — the biggest one.' },
+  { key: 'passive_mode', label: 'Where You Stop Choosing', hint: 'Where you let the world choose for you.' },
+  { key: 'late_night_scene', label: 'What Comes Back at Night', hint: 'The image that surfaces at 4 AM.' },
+  { key: 'unspoken_desire', label: 'The Want You Rarely Admit', hint: 'What your behavior reveals but your words deny.' },
   { key: 'interests', label: 'The Things You Reach For', hint: 'Specific names — music, food, places, niches you actually live in.' },
 ];
 
@@ -59,7 +59,7 @@ export function ProfileEditor({ initial }: { initial: Profile }) {
           disabled={isPending}
           className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink disabled:opacity-30 disabled:hover:text-ash transition-colors duration-700"
         >
-          {isPending ? 'Keeping it...' : 'This is me.'}
+          {isPending ? 'Saving...' : 'This feels right'}
         </button>
       </div>
     </div>
