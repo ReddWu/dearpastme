@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import type { Branch, FutureMoment } from '@/lib/types';
 import { BRANCH_LABEL } from '@/lib/types';
+import { saveFutureVision, type VisionEligibility } from '@/app/actions/vision';
 
 // XTTS hands back the user's voice as it sounds today. We age it in the
 // browser at playback time: pitch-down (via playbackRate + preservesPitch:false)
@@ -24,6 +25,12 @@ export type FutureCard = {
   letter: string;
   voice_message_text: string;
   voice_message_url: string;
+  // The user's revised vision text (overrides life_description for display
+  // on the chosen card) and whether this card is the one they marked
+  // want_to_become. Together they unlock the hidden click-to-edit on the
+  // chosen card without exposing any UI affordance until clicked.
+  vision: string | null;
+  is_chosen_vision: boolean;
 };
 
 export function FutureGallery({
@@ -258,9 +265,16 @@ function FutureDrawer({
           <img src={future.image_url} alt="" className="w-full h-full object-cover" />
         </div>
 
-        <p className="font-serif text-lg leading-loose text-ink/90 whitespace-pre-wrap">
-          {future.life_description}
-        </p>
+        {future.is_chosen_vision ? (
+          <VisionParagraph
+            futureId={future.id}
+            initialText={future.vision ?? future.life_description}
+          />
+        ) : (
+          <p className="font-serif text-lg leading-loose text-ink/90 whitespace-pre-wrap">
+            {future.life_description}
+          </p>
+        )}
 
         <div className="border-t border-ash/20 pt-12">
           <p className="font-serif italic text-lg leading-loose text-vellum whitespace-pre-wrap">
@@ -354,4 +368,114 @@ function MomentDrawer({
       </div>
     </div>
   );
+}
+
+// Hidden click-to-edit. The paragraph looks like every other paragraph
+// — no pencil, no border, no hint. Hovering it changes the cursor to a
+// text caret as the only quiet signal that it can be touched. Clicking
+// flips it into a textarea; saving calls the server action which is
+// where the once-per-month + 15-day rule actually lives. The rule is
+// only revealed (as a single inline line) if the server rejects the
+// save, never before.
+function VisionParagraph({
+  futureId,
+  initialText,
+}: {
+  futureId: string;
+  initialText: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(initialText);
+  const [draft, setDraft] = useState(initialText);
+  const [lockMessage, setLockMessage] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function startEdit() {
+    setLockMessage(null);
+    setDraft(text);
+    setEditing(true);
+  }
+
+  function cancel() {
+    setDraft(text);
+    setEditing(false);
+  }
+
+  function save() {
+    setLockMessage(null);
+    startTransition(async () => {
+      try {
+        const result = await saveFutureVision({ futureId, text: draft });
+        if (result.ok) {
+          setText(draft);
+          setEditing(false);
+        } else {
+          setLockMessage(describeLock(result));
+        }
+      } catch (err) {
+        setLockMessage(err instanceof Error ? err.message : 'Save got lost.');
+      }
+    });
+  }
+
+  if (!editing) {
+    return (
+      <p
+        onClick={startEdit}
+        className="font-serif text-lg leading-loose text-ink/90 whitespace-pre-wrap cursor-text"
+      >
+        {text}
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <textarea
+        autoFocus
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        rows={Math.max(8, Math.min(20, draft.split('\n').length + 4))}
+        className="w-full bg-transparent border border-ash/25 focus:border-ink/40 outline-none p-5 text-ink/95 leading-loose font-serif text-lg resize-y"
+      />
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-xs italic text-ash/70 min-h-4">
+          {lockMessage ?? ''}
+        </p>
+        <div className="flex items-center gap-6">
+          <button
+            type="button"
+            onClick={cancel}
+            disabled={isPending}
+            className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink disabled:opacity-30 transition-colors duration-700"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={save}
+            disabled={isPending || draft.trim().length < 12}
+            className="text-[0.7rem] tracking-[0.4em] uppercase text-ink hover:text-vellum disabled:opacity-30 disabled:hover:text-ink transition-colors duration-700"
+          >
+            {isPending ? 'Keeping it…' : 'Keep this vision'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function describeLock(r: VisionEligibility): string {
+  if (r.ok) return '';
+  if (r.reason === 'edited_this_month') {
+    return 'You revised this already this month. The next chance opens on the first of next month.';
+  }
+  if (r.reason === 'not_enough_days') {
+    const remaining = r.needed - r.daysSoFar;
+    return `Re-editing opens after writing ${r.needed} days here this month. ${r.daysSoFar} so far — ${remaining} more to go.`;
+  }
+  if (r.reason === 'not_chosen') {
+    return 'This isn\'t the self you marked.';
+  }
+  return 'Cannot revise this right now.';
 }

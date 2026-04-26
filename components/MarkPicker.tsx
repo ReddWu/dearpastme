@@ -1,17 +1,32 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { setMarks } from '@/app/actions/marks';
 import type { Branch } from '@/lib/types';
 import { BRANCH_LABEL } from '@/lib/types';
 
-type Card = { id: string; branch: Branch; image_url: string };
+type Card = {
+  id: string;
+  branch: Branch;
+  image_url: string;
+  vision_seed: string;
+};
 
 export function MarkPicker({ futures }: { futures: Card[] }) {
   const [want, setWant] = useState<string | null>(null);
   const [afraid, setAfraid] = useState<string | null>(null);
+  const [visionText, setVisionText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // When the user picks (or changes) want_to_become, prefill the inline
+  // editor with that future's seed text. We don't reset their typed-in
+  // changes if they re-click the same card.
+  useEffect(() => {
+    if (!want) { setVisionText(''); return; }
+    const picked = futures.find((f) => f.id === want);
+    if (picked) setVisionText(picked.vision_seed);
+  }, [want, futures]);
 
   function pick(id: string, kind: 'want' | 'afraid') {
     if (kind === 'want') {
@@ -30,12 +45,15 @@ export function MarkPicker({ futures }: { futures: Card[] }) {
         await setMarks({
           want_to_become: want ?? undefined,
           afraid_of: afraid ?? undefined,
+          vision_text: want ? visionText : undefined,
         });
       } catch (e) {
         setError(e instanceof Error ? e.message : 'The save got lost.');
       }
     });
   }
+
+  const wantPicked = futures.find((f) => f.id === want) ?? null;
 
   return (
     <div className="flex flex-col gap-16">
@@ -77,6 +95,23 @@ export function MarkPicker({ futures }: { futures: Card[] }) {
           );
         })}
       </div>
+
+      {wantPicked && (
+        <div className="flex flex-col gap-4 max-w-2xl mx-auto w-full fade-in-slow">
+          <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ash text-center">
+            What this self looks like
+          </p>
+          <textarea
+            value={visionText}
+            onChange={(e) => setVisionText(e.target.value)}
+            rows={8}
+            className="w-full bg-transparent border border-ash/20 focus:border-ink/40 outline-none p-5 text-ink/90 leading-loose font-serif text-base resize-y"
+          />
+          <p className="text-xs italic text-ash/60 text-center">
+            These words become your aim. Revise them now if any of it isn&apos;t yours.
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-col items-center gap-4">
         {error && <p className="text-sm text-ash italic">{error}</p>}

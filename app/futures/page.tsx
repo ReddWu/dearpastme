@@ -32,13 +32,22 @@ export default async function FuturesPage() {
   if (!userId) redirect('/begin');
 
   const sb = await supabaseRoute();
-  const { data } = await sb
-    .from('futures')
-    .select('id, branch, image_url, life_description, letter, voice_message_text, voice_message_url, generation_round')
-    .eq('user_id', userId)
-    .order('generation_round', { ascending: false });
+  const [{ data }, { data: marks }] = await Promise.all([
+    sb
+      .from('futures')
+      .select('id, branch, image_url, life_description, letter, voice_message_text, voice_message_url, vision, generation_round')
+      .eq('user_id', userId)
+      .order('generation_round', { ascending: false }),
+    sb
+      .from('future_marks')
+      .select('future_id, mark')
+      .eq('user_id', userId)
+      .eq('mark', 'want_to_become'),
+  ]);
 
   if (!data?.length) redirect('/generating');
+
+  const wantId = marks?.[0]?.future_id ?? null;
 
   const latestRound = data[0].generation_round;
   const cards: FutureCard[] = BRANCHES
@@ -52,6 +61,11 @@ export default async function FuturesPage() {
       letter: d.letter ?? '',
       voice_message_text: d.voice_message_text ?? '',
       voice_message_url: d.voice_message_url ?? '',
+      // The user's edited vision (if any) and whether THIS card is the one
+      // they marked want_to_become — both are needed to surface the hidden
+      // click-to-edit affordance only on the chosen future.
+      vision: (d.vision as string | null) ?? null,
+      is_chosen_vision: d.id === wantId,
     }));
   const moments = await listMomentImages(userId);
 
