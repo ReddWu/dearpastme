@@ -17,8 +17,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={fraunces.variable}>
-      <body className="min-h-screen">{children}</body>
+    // suppressHydrationWarning on html + body absorbs the attribute mismatches
+    // browser extensions (translate, accessibility, password managers) inject
+    // before React hydrates. The warning only suppresses one level deep, which
+    // is exactly what we want — real component bugs still surface normally.
+    <html lang="en" className={fraunces.variable} suppressHydrationWarning>
+      <body className="min-h-screen" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

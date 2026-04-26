@@ -97,7 +97,7 @@ export default async function JournalPage() {
       {/* Top bar — minimal, Medium-flavored */}
       <header className="flex items-baseline justify-between border-b border-ash/15 pb-6 mb-12">
         <div className="flex items-baseline gap-6">
-          <h1 className="text-base tracking-[0.4em] uppercase text-ink">Journal</h1>
+          <h1 className="text-base tracking-[0.4em] uppercase text-ink">Dear Past Me</h1>
           <Link
             href="/futures"
             className="text-[0.65rem] tracking-[0.35em] uppercase text-ash hover:text-ink transition-colors duration-700"
