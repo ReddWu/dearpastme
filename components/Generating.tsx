@@ -44,16 +44,13 @@ export function Generating() {
     if (startedRef.current) return;
     startedRef.current = true;
 
-    let cancelled = false;
     const timeoutId = window.setTimeout(() => {
-      if (cancelled) return;
       setError('The future got lost in transit.');
       setPhase('error');
     }, FAILURE_AFTER_MS);
 
     fetch('/api/generate-futures', { method: 'POST' })
       .then(async (res) => {
-        if (cancelled) return;
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
           throw new Error(data.error ?? 'The future got lost in transit.');
@@ -63,14 +60,12 @@ export function Generating() {
         window.setTimeout(() => router.push('/futures'), 1800);
       })
       .catch((e) => {
-        if (cancelled) return;
         setError(e instanceof Error ? e.message : 'The future got lost in transit.');
         setPhase('error');
       })
       .finally(() => window.clearTimeout(timeoutId));
 
     return () => {
-      cancelled = true;
       window.clearTimeout(timeoutId);
     };
   }, [router]);

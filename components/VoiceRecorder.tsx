@@ -60,7 +60,9 @@ export function VoiceRecorder() {
       tickRef.current = window.setInterval(() => {
         setSeconds((s) => {
           const next = s + 1;
-          if (next >= TARGET_SECONDS) recorder.state === 'recording' && recorder.stop();
+          if (next >= TARGET_SECONDS && recorder.state === 'recording') {
+            recorder.stop();
+          }
           return next;
         });
       }, 1000);

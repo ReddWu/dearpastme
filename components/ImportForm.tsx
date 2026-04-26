@@ -18,7 +18,7 @@ export function ImportForm() {
 
   // Cycle the in-flight verses while parsing. Stops the moment pending ends.
   useEffect(() => {
-    if (!isPending) { setVerseIdx(0); return; }
+    if (!isPending) return;
     const id = window.setInterval(() => {
       setVerseIdx((i) => (i + 1) % READING_VERSES.length);
     }, VERSE_MS);
@@ -27,6 +27,7 @@ export function ImportForm() {
 
   function onSubmit(formData: FormData) {
     setError(null);
+    setVerseIdx(0);
     startTransition(async () => {
       try {
         await importProfile(formData);

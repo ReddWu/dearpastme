@@ -16,6 +16,12 @@ export type FutureContent = {
   voice_message: string;
 };
 
+export type FutureMoment = {
+  id: string;
+  branch: Branch;
+  image_url: string;
+};
+
 export const BRANCH_LABEL: Record<Branch, string> = {
   flowing: 'Flowing',
   realized: 'Realized',

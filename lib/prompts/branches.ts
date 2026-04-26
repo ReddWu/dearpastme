@@ -21,8 +21,8 @@ ${p.unspoken_desire}`;
 const SHARED_OUTPUT = `Output exactly this JSON and nothing else:
 {
   "image_prompt": "A prompt in English for an image-to-image model. Describe a realistic portrait photograph that captures this future branch's visual mood, age, expression, and surroundings. Do not include any names.",
-  "life_description": "180-260 words in English, second person, describing one specific scene from this future life. Concrete, filmable details (place, time, action, an object, a person). Do not summarize. Do not console.",
-  "letter": "150-220 words in English, second person, written by the future you to the present you. No pleasantries. Do not open with 'Dear' or similar. The closing line must contain one specific concrete detail (not an abstract feeling).",
+  "life_description": "120-170 words in English, second person, describing one specific scene from this future life. Concrete, filmable details (place, time, action, an object, a person). Do not summarize. Do not console.",
+  "letter": "100-140 words in English, second person, written by the future you to the present you. No pleasantries. Do not open with 'Dear' or similar. The closing line must contain one specific concrete detail (not an abstract feeling).",
   "voice_message": "A single sentence, 10-22 words. The emotional core of the whole product. It should land like an ordinary line of speech that suddenly turns out to be true."
 }
 

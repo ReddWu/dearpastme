@@ -1,4 +1,3 @@
-import { supabaseRoute } from './supabase/route';
 import { supabaseServer } from './supabase/server';
 
 export async function uploadToBucket(opts: {
@@ -13,7 +12,12 @@ export async function uploadToBucket(opts: {
   // Default true to preserve existing call sites.
   sign?: boolean;
 }): Promise<{ key: string; signedUrl: string | null; publicUrl: string | null }> {
-  const sb = await supabaseRoute();
+  // Use the service-role client for storage writes. RLS only has INSERT
+  // policies on these buckets, so an upsert (which becomes UPDATE for
+  // existing files like a re-generated portrait) gets rejected. The
+  // server already namespaces every key under `${userId}/...`, so
+  // bypassing RLS here is safe.
+  const sb = supabaseServer();
   const key = `${opts.userId}/${opts.path}`;
 
   const body: Blob =

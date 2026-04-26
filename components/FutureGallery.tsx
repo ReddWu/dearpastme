@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import type { Branch } from '@/lib/types';
+import type { Branch, FutureMoment } from '@/lib/types';
 import { BRANCH_LABEL } from '@/lib/types';
 
 // XTTS hands back the user's voice as it sounds today. We age it in the
@@ -26,34 +26,64 @@ export type FutureCard = {
   voice_message_url: string;
 };
 
-export function FutureGallery({ futures }: { futures: FutureCard[] }) {
+export function FutureGallery({
+  futures,
+  moments,
+}: {
+  futures: FutureCard[];
+  moments: FutureMoment[];
+}) {
   const [openId, setOpenId] = useState<string | null>(null);
+  const [openMomentId, setOpenMomentId] = useState<string | null>(null);
   const open = futures.find((f) => f.id === openId) ?? null;
+  const openMoment = moments.find((m) => m.id === openMomentId) ?? null;
+  const galleryItems = [
+    ...moments.slice(0, 3).map((moment) => ({ kind: 'moment' as const, moment })),
+    ...futures.map((future) => ({ kind: 'future' as const, future })),
+    ...moments.slice(3).map((moment) => ({ kind: 'moment' as const, moment })),
+  ];
 
   return (
     <div className="flex flex-col gap-20">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 fade-in-slow">
-        {futures.map((f) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-8 fade-in-slow">
+        {galleryItems.map((item) => item.kind === 'future' ? (
           <button
-            key={f.id}
+            key={item.future.id}
             type="button"
-            onClick={() => setOpenId(f.id)}
+            onClick={() => setOpenId(item.future.id)}
             className="group flex flex-col gap-4 text-left"
           >
             <div className="relative aspect-[3/4] overflow-hidden bg-ash/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={f.image_url}
-                alt={BRANCH_LABEL[f.branch]}
+                src={item.future.image_url}
+                alt={BRANCH_LABEL[item.future.branch]}
                 className="w-full h-full object-cover transition-all duration-1000 grayscale-[15%] group-hover:grayscale-0 group-hover:scale-[1.02]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             </div>
             <div className="flex items-baseline justify-between">
-              <span className="text-base text-ink tracking-wide">{BRANCH_LABEL[f.branch]}</span>
+              <span className="text-base text-ink tracking-wide">{BRANCH_LABEL[item.future.branch]}</span>
               <span className="text-[0.65rem] tracking-[0.3em] uppercase text-ash group-hover:text-ink transition-colors duration-700">
                 Open
               </span>
+            </div>
+          </button>
+        ) : (
+          <button
+            key={item.moment.id}
+            type="button"
+            onClick={() => setOpenMomentId(item.moment.id)}
+            className="group flex flex-col gap-4 text-left"
+          >
+            <div className="relative aspect-[3/4] overflow-hidden bg-ash/10">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.moment.image_url}
+                alt=""
+                className="w-full h-full object-cover transition-all duration-1000 grayscale-[8%] group-hover:grayscale-0 group-hover:scale-[1.02]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
             </div>
           </button>
         ))}
@@ -69,6 +99,7 @@ export function FutureGallery({ futures }: { futures: FutureCard[] }) {
       </div>
 
       {open && <FutureDrawer future={open} onClose={() => setOpenId(null)} />}
+      {openMoment && <MomentDrawer moment={openMoment} onClose={() => setOpenMomentId(null)} />}
     </div>
   );
 }
@@ -205,6 +236,12 @@ function FutureDrawer({
             src={future.voice_message_url}
             onEnded={() => setPlaying(false)}
             preload="auto"
+            // REQUIRED for Web Audio. Without this attribute, MediaElementAudioSourceNode
+            // taints cross-origin audio (Supabase storage → another origin) and the entire
+            // graph silently outputs zero. Setting this on the element forces the browser
+            // to do a CORS fetch; Supabase public buckets reply with permissive headers,
+            // so the source stays clean and audible through our pitch-down chain.
+            crossOrigin="anonymous"
           />
           <button
             type="button"
@@ -229,6 +266,52 @@ function FutureDrawer({
           >
             {revealed ? future.voice_message_text : 'Press play. Hear them say it.'}
           </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MomentDrawer({
+  moment,
+  onClose,
+}: { moment: FutureMoment; onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handler);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/95 overflow-y-auto fade-in-slow"
+      onClick={onClose}
+    >
+      <div
+        className="min-h-screen w-full max-w-5xl mx-auto px-8 py-20 flex flex-col gap-10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="self-end text-[0.65rem] tracking-[0.3em] uppercase text-ash hover:text-ink transition-colors duration-700"
+        >
+          Close
+        </button>
+
+        <div className="flex justify-center">
+          <span className="text-[0.7rem] tracking-[0.4em] uppercase text-ash">
+            {BRANCH_LABEL[moment.branch]}
+          </span>
+        </div>
+
+        <div className="w-full max-w-3xl mx-auto overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={moment.image_url} alt="" className="w-full h-auto object-cover" />
         </div>
       </div>
     </div>
