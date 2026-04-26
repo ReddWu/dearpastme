@@ -19,6 +19,32 @@ const TARGET_SECONDS = 60;
 const MIN_SECONDS = 30;
 
 type State = 'idle' | 'recording' | 'review' | 'uploading' | 'error';
+type RecorderConfig = {
+  mimeType?: string;
+  blobType: string;
+  filename: string;
+};
+
+function pickRecorderConfig(): RecorderConfig {
+  if (typeof MediaRecorder === 'undefined') {
+    return { blobType: 'audio/webm', filename: 'sample.webm' };
+  }
+
+  const candidates: RecorderConfig[] = [
+    { mimeType: 'audio/webm;codecs=opus', blobType: 'audio/webm', filename: 'sample.webm' },
+    { mimeType: 'audio/webm', blobType: 'audio/webm', filename: 'sample.webm' },
+    { mimeType: 'audio/mp4', blobType: 'audio/mp4', filename: 'sample.m4a' },
+    { mimeType: 'audio/mp4;codecs=mp4a.40.2', blobType: 'audio/mp4', filename: 'sample.m4a' },
+  ];
+
+  for (const candidate of candidates) {
+    if (candidate.mimeType && MediaRecorder.isTypeSupported(candidate.mimeType)) {
+      return candidate;
+    }
+  }
+
+  return { blobType: 'audio/webm', filename: 'sample.webm' };
+}
 
 export function VoiceRecorder() {
   const router = useRouter();
@@ -26,6 +52,7 @@ export function VoiceRecorder() {
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const recorderConfigRef = useRef<RecorderConfig>({ blobType: 'audio/webm', filename: 'sample.webm' });
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const blobRef = useRef<Blob | null>(null);
@@ -39,14 +66,21 @@ export function VoiceRecorder() {
   async function start() {
     setError(null);
     try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('This browser cannot record audio directly.');
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      const config = pickRecorderConfig();
+      recorderConfigRef.current = config;
+      const recorder = config.mimeType
+        ? new MediaRecorder(stream, { mimeType: config.mimeType })
+        : new MediaRecorder(stream);
       chunksRef.current = [];
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
       recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const blob = new Blob(chunksRef.current, { type: recorderConfigRef.current.blobType });
         blobRef.current = blob;
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
@@ -66,8 +100,9 @@ export function VoiceRecorder() {
           return next;
         });
       }, 1000);
-    } catch {
-      setError('No microphone access. Check the browser permission and try again.');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'No microphone access.';
+      setError(`${msg} You can also upload an audio file instead.`);
       setState('error');
     }
   }
@@ -91,7 +126,32 @@ export function VoiceRecorder() {
     setError(null);
     try {
       const fd = new FormData();
-      fd.append('audio', blobRef.current, 'sample.webm');
+      fd.append('audio', blobRef.current, recorderConfigRef.current.filename);
+      const res = await fetch('/api/voice', { method: 'POST', body: fd });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? 'The voice never arrived.');
+      }
+      router.push('/profile/import');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'The voice never arrived.');
+      setState('review');
+    }
+  }
+
+  async function uploadFile(file: File) {
+    setState('uploading');
+    setError(null);
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    setAudioUrl(URL.createObjectURL(file));
+    blobRef.current = file;
+    recorderConfigRef.current = {
+      blobType: file.type || 'audio/webm',
+      filename: file.name || 'sample.webm',
+    };
+    try {
+      const fd = new FormData();
+      fd.append('audio', file, file.name || recorderConfigRef.current.filename);
       const res = await fetch('/api/voice', { method: 'POST', body: fd });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -115,13 +175,32 @@ export function VoiceRecorder() {
 
       <div className="flex flex-col items-center gap-6 fade-in-delayed">
         {state === 'idle' && (
-          <button
-            type="button"
-            onClick={start}
-            className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink transition-colors duration-700 border border-ash/30 hover:border-ink/40 px-10 py-4"
-          >
-            Begin recording.
-          </button>
+          <div className="flex flex-col items-center gap-5">
+            <button
+              type="button"
+              onClick={start}
+              className="text-[0.7rem] tracking-[0.4em] uppercase text-ash hover:text-ink transition-colors duration-700 border border-ash/30 hover:border-ink/40 px-10 py-4"
+            >
+              Begin recording.
+            </button>
+
+            <label className="cursor-pointer text-[0.65rem] tracking-[0.3em] uppercase text-ash hover:text-ink transition-colors duration-700">
+              Upload recording instead
+              <input
+                type="file"
+                accept="audio/*"
+                capture="user"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.currentTarget.files?.[0];
+                  if (file) {
+                    void uploadFile(file);
+                  }
+                  e.currentTarget.value = '';
+                }}
+              />
+            </label>
+          </div>
         )}
 
         {state === 'recording' && (
@@ -160,6 +239,22 @@ export function VoiceRecorder() {
                 Send forward.
               </button>
             </div>
+            <label className="cursor-pointer text-[0.65rem] tracking-[0.3em] uppercase text-ash hover:text-ink transition-colors duration-700">
+              Use a different file
+              <input
+                type="file"
+                accept="audio/*"
+                capture="user"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.currentTarget.files?.[0];
+                  if (file) {
+                    void uploadFile(file);
+                  }
+                  e.currentTarget.value = '';
+                }}
+              />
+            </label>
           </div>
         )}
 

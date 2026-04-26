@@ -37,56 +37,94 @@ export function FutureGallery({
   const [openMomentId, setOpenMomentId] = useState<string | null>(null);
   const open = futures.find((f) => f.id === openId) ?? null;
   const openMoment = moments.find((m) => m.id === openMomentId) ?? null;
-  const galleryItems = [
-    ...moments.slice(0, 3).map((moment) => ({ kind: 'moment' as const, moment })),
-    ...futures.map((future) => ({ kind: 'future' as const, future })),
-    ...moments.slice(3).map((moment) => ({ kind: 'moment' as const, moment })),
-  ];
+  const topMoments = moments.slice(0, 4);
+  const bottomMoments = moments.slice(4);
 
   return (
     <div className="flex flex-col gap-20">
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-8 fade-in-slow">
-        {galleryItems.map((item) => item.kind === 'future' ? (
-          <button
-            key={item.future.id}
-            type="button"
-            onClick={() => setOpenId(item.future.id)}
-            className="group flex flex-col gap-4 text-left"
-          >
-            <div className="relative aspect-[3/4] overflow-hidden bg-ash/10">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.future.image_url}
-                alt={BRANCH_LABEL[item.future.branch]}
-                className="w-full h-full object-cover transition-all duration-1000 grayscale-[15%] group-hover:grayscale-0 group-hover:scale-[1.02]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-            </div>
-            <div className="flex items-baseline justify-between">
-              <span className="text-base text-ink tracking-wide">{BRANCH_LABEL[item.future.branch]}</span>
-              <span className="text-[0.65rem] tracking-[0.3em] uppercase text-ash group-hover:text-ink transition-colors duration-700">
-                Open
-              </span>
-            </div>
-          </button>
-        ) : (
-          <button
-            key={item.moment.id}
-            type="button"
-            onClick={() => setOpenMomentId(item.moment.id)}
-            className="group flex flex-col gap-4 text-left"
-          >
-            <div className="relative aspect-[3/4] overflow-hidden bg-ash/10">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.moment.image_url}
-                alt=""
-                className="w-full h-full object-cover transition-all duration-1000 grayscale-[8%] group-hover:grayscale-0 group-hover:scale-[1.02]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
-            </div>
-          </button>
-        ))}
+      <div className="flex flex-col gap-10 fade-in-slow">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 xl:gap-6">
+          {topMoments.map((moment) => (
+            <button
+              key={moment.id}
+              type="button"
+              onClick={() => setOpenMomentId(moment.id)}
+              className="group flex flex-col gap-3 text-left"
+            >
+              <div className="relative aspect-[3/4] overflow-hidden bg-ash/10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={moment.image_url}
+                  alt=""
+                  className="w-full h-full object-cover transition-all duration-1000 grayscale-[8%] group-hover:grayscale-0 group-hover:scale-[1.02]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+                <span className="absolute left-3 bottom-3 text-[0.55rem] tracking-[0.28em] uppercase text-vellum/80">
+                  Glimpse
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ash/80 text-center">
+            The Three That Speak
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 xl:gap-10 w-full">
+            {futures.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setOpenId(f.id)}
+                className="group flex flex-col gap-4 text-left"
+              >
+                <div className="relative aspect-[3/4] overflow-hidden bg-ash/10">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={f.image_url}
+                    alt={BRANCH_LABEL[f.branch]}
+                    className="w-full h-full object-cover transition-all duration-1000 grayscale-[15%] group-hover:grayscale-0 group-hover:scale-[1.02]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  <span className="absolute left-4 top-4 text-[0.55rem] tracking-[0.3em] uppercase text-vellum/85 border border-vellum/20 px-2 py-1 bg-black/20">
+                    Voice + Letter
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-base text-ink tracking-wide">{BRANCH_LABEL[f.branch]}</span>
+                  <span className="text-[0.65rem] tracking-[0.3em] uppercase text-ash group-hover:text-ink transition-colors duration-700">
+                    Open story
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-5 xl:gap-6">
+          {bottomMoments.map((moment) => (
+            <button
+              key={moment.id}
+              type="button"
+              onClick={() => setOpenMomentId(moment.id)}
+              className="group flex flex-col gap-3 text-left"
+            >
+              <div className="relative aspect-[3/4] overflow-hidden bg-ash/10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={moment.image_url}
+                  alt=""
+                  className="w-full h-full object-cover transition-all duration-1000 grayscale-[8%] group-hover:grayscale-0 group-hover:scale-[1.02]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+                <span className="absolute left-3 bottom-3 text-[0.55rem] tracking-[0.28em] uppercase text-vellum/80">
+                  Glimpse
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex justify-center">

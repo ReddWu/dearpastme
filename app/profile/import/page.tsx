@@ -1,5 +1,4 @@
 import { Caption, Headline, Stage, Whisper } from '@/components/Stage';
-import { CopyBlock } from '@/components/CopyBlock';
 import { ImportForm } from '@/components/ImportForm';
 
 const LLM_PROMPT = `Based on everything you know about me — the things I've mentioned, complained about, hesitated on, and returned to again and again across our conversations — please fill out the profile below about me, in second person ("you").
@@ -34,14 +33,10 @@ export default function ProfileImportPage() {
       <Caption>Step Three</Caption>
       <Headline>Bring back a profile of you.</Headline>
       <Whisper>
-        Open the AI you talk to most — the one that has seen you.
-        Paste the passage below into it, and ask it to write a profile of you.
-        Then paste its full reply back here.
+        Ask the AI that knows you best to write this profile, or skip that step
+        and answer the six questions yourself.
       </Whisper>
-
-      <CopyBlock text={LLM_PROMPT} />
-
-      <ImportForm />
+      <ImportForm prompt={LLM_PROMPT} />
     </Stage>
   );
 }

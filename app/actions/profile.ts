@@ -51,6 +51,32 @@ export async function importProfile(formData: FormData) {
   redirect('/profile/edit');
 }
 
+export async function saveImportedProfile(formData: FormData) {
+  const profile: Profile = {
+    current_self: String(formData.get('current_self') ?? '').trim(),
+    inertia: String(formData.get('inertia') ?? '').trim(),
+    the_thing: String(formData.get('the_thing') ?? '').trim(),
+    passive_mode: String(formData.get('passive_mode') ?? '').trim(),
+    late_night_scene: String(formData.get('late_night_scene') ?? '').trim(),
+    unspoken_desire: String(formData.get('unspoken_desire') ?? '').trim(),
+  };
+
+  for (const [key, value] of Object.entries(profile)) {
+    if (value.length < 12) {
+      throw new Error(`That answer is too short: ${key.replace(/_/g, ' ')}.`);
+    }
+  }
+
+  const userId = await ensureAnonUser();
+  const sb = await supabaseRoute();
+  const { error } = await sb.from('profiles').upsert(
+    { user_id: userId, ...profile } as never,
+    { onConflict: 'user_id' },
+  );
+  if (error) throw new Error(`Couldn't tuck this profile into the drawer: ${error.message}`);
+  redirect('/profile/edit');
+}
+
 export async function saveProfile(profile: Profile) {
   const userId = await ensureAnonUser();
   const sb = await supabaseRoute();

@@ -58,8 +58,8 @@ export default async function FuturesPage() {
   return (
     <Stage align="top" width="wide">
       <Caption>Ten Glimpses</Caption>
-      <Headline>Ten scenes from the lives ahead.</Headline>
-      <Whisper>Three of them speak. The other seven only flash past.</Whisper>
+      <Headline>Three futures speak. Seven more flicker around them.</Headline>
+      <Whisper>The three in the center hold the voice and the story. The others are only passing glimpses.</Whisper>
       <FutureGallery futures={cards} moments={moments} />
     </Stage>
   );
