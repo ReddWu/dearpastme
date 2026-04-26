@@ -99,6 +99,7 @@ async function generateMomentImages(opts: {
   branch: Branch;
   selfieUrl: string;
   lifeDescription: string;
+  interests: string;
 }) {
   const tasks = Array.from({ length: momentCount(opts.branch) }, (_, momentIndex) => momentIndex)
     .map(async (momentIndex) => {
@@ -108,6 +109,7 @@ async function generateMomentImages(opts: {
           selfieUrl: opts.selfieUrl,
           branch: opts.branch,
           lifeDescription: opts.lifeDescription,
+          interests: opts.interests,
           momentIndex,
         }),
       );
@@ -149,6 +151,7 @@ export async function POST() {
       passive_mode: profileRow.passive_mode ?? '',
       late_night_scene: profileRow.late_night_scene ?? '',
       unspoken_desire: profileRow.unspoken_desire ?? '',
+      interests: profileRow.interests ?? '',
     };
 
     const { data: voiceRow, error: voiceErr } = await sb
@@ -182,6 +185,7 @@ export async function POST() {
         branch,
         selfieUrl,
         lifeDescription: content.life_description,
+        interests: profile.interests,
       }));
     }
 

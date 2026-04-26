@@ -7,6 +7,7 @@ export type Profile = {
   passive_mode: string;
   late_night_scene: string;
   unspoken_desire: string;
+  interests: string;
 };
 
 export type FutureContent = {

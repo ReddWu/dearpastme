@@ -11,6 +11,7 @@ const FIELDS: { key: keyof Profile; label: string; hint: string }[] = [
   { key: 'passive_mode', label: 'Passive Mode', hint: 'Where you let the world push you.' },
   { key: 'late_night_scene', label: 'What You Think About Late At Night', hint: 'The image that surfaces at 4 AM.' },
   { key: 'unspoken_desire', label: 'The Unspoken Want', hint: 'What your behavior reveals but your words deny.' },
+  { key: 'interests', label: 'The Things You Reach For', hint: 'Specific names — music, food, places, niches you actually live in.' },
 ];
 
 export function ProfileEditor({ initial }: { initial: Profile }) {

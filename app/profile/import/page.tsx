@@ -25,6 +25,9 @@ Describe one specific scene: at 4 AM on a sleepless night, what does this person
 [The Unspoken Want]
 A want this person won't admit out loud, but their behavior reveals?
 
+[The Things You Reach For]
+The specific things this person actually reaches for when no one is watching and they don't have to perform. Be concrete and use names. Music they put on alone, food they cook or order without thinking, the kind of book they stay up reading, the niche internet they go down at 1 AM, sports or movement they actually do (or watch), places they keep coming back to (cities, neighborhoods, kinds of rooms), the body of work they would save first. Five to eight specific items. Names, not categories — "Mitski and old Frank Ocean" beats "indie music"; "tonkotsu ramen and Sichuan dry pot" beats "Asian food"; "long walks in Mission at dusk" beats "exploring the city".
+
 When done, do not summarize. Do not ask if it's accurate. Just stop.`;
 
 export default function ProfileImportPage() {
@@ -34,7 +37,7 @@ export default function ProfileImportPage() {
       <Headline>Bring back a profile of you.</Headline>
       <Whisper>
         Ask the AI that knows you best to write this profile, or skip that step
-        and answer the six questions yourself.
+        and answer the seven questions yourself.
       </Whisper>
       <ImportForm prompt={LLM_PROMPT} />
     </Stage>

@@ -10,6 +10,7 @@ exactly one JSON object and nothing else. The required keys, all strings:
 - passive_mode
 - late_night_scene
 - unspoken_desire
+- interests
 
 Rules:
 1. Output JSON only. No markdown fences, no commentary, no extra characters.
@@ -37,6 +38,7 @@ export async function parseProfile(rawText: string): Promise<Profile> {
   const required: (keyof Profile)[] = [
     'current_self', 'inertia', 'the_thing',
     'passive_mode', 'late_night_scene', 'unspoken_desire',
+    'interests',
   ];
   for (const k of required) {
     if (typeof parsed[k] !== 'string' || !parsed[k]) {

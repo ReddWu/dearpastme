@@ -20,13 +20,14 @@ export default async function ProfileEditPage() {
     passive_mode: data.passive_mode ?? '',
     late_night_scene: data.late_night_scene ?? '',
     unspoken_desire: data.unspoken_desire ?? '',
+    interests: data.interests ?? '',
   };
 
   return (
     <Stage align="top" width="wide">
       <Caption>Step Four</Caption>
       <Headline>Is this you?</Headline>
-      <Whisper>If a line doesn&apos;t fit, change it. The three futures grow from these six.</Whisper>
+      <Whisper>If a line doesn&apos;t fit, change it. The three futures grow from these seven.</Whisper>
       <ProfileEditor initial={profile} />
     </Stage>
   );

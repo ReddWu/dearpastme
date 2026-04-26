@@ -59,6 +59,7 @@ export async function saveImportedProfile(formData: FormData) {
     passive_mode: String(formData.get('passive_mode') ?? '').trim(),
     late_night_scene: String(formData.get('late_night_scene') ?? '').trim(),
     unspoken_desire: String(formData.get('unspoken_desire') ?? '').trim(),
+    interests: String(formData.get('interests') ?? '').trim(),
   };
 
   for (const [key, value] of Object.entries(profile)) {
