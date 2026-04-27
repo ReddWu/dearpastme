@@ -87,6 +87,11 @@ export function Generating() {
           <span className="block w-1 h-1 rounded-full bg-ink/40 animate-pulse [animation-delay:200ms]" />
           <span className="block w-1 h-1 rounded-full bg-ink/20 animate-pulse [animation-delay:400ms]" />
         </div>
+        {phase === 'working' && (
+          <p className="text-xs text-ash/70 italic max-w-md text-center mt-4 leading-loose">
+            About five minutes. They&apos;re walking ten years to get here — go pour yourself a coffee. Don&apos;t close the tab.
+          </p>
+        )}
         {phase === 'done' && (
           <p className="text-[0.7rem] tracking-[0.4em] uppercase text-ash mt-4">
             They&apos;re here.
