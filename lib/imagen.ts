@@ -38,7 +38,12 @@ const MOMENT_SCENES: Record<Branch, string[]> = {
     // domain: deepened romantic partnership
     'the same person at a sunlit kitchen counter in the morning, leaning shoulder-to-shoulder with a partner, both reading something together on a tablet, two mugs of coffee, an unspectacular intimacy, a small private smile — the look of a relationship that grew up alongside them',
     // domain: body / sustained training transformation
-    'the same person mid- or post-workout in natural light — could be running on an outdoor track at sunrise, cycling on a quiet road, climbing on real rock, finishing a set of pull-ups in a sun-lit gym, or stepping out of a pool — looking visibly fitter than the input photo: clearer healthier skin, leaner or stronger body composition built from years of sustained training, mid-30s. Documentary realism, natural light, slightly tired but quietly satisfied expression. NOT a gym selfie, NOT flexing, NOT mirror pose, NOT a glossy Instagram fitspo or fitness-ad aesthetic — the unposed candid moment of someone who became this kind of person',
+    // Contains a {ACTIVITY} placeholder. generateFutureMomentAsset substitutes
+    // a specific activity sentence here — pulled from the user's stated
+    // interests if they named a sport, otherwise the default park run.
+    // Without this hard substitution Nano Banana wandered (would render a
+    // post-shower or selfie shot) — so the activity is now deterministic.
+    'the same person {ACTIVITY}, looking visibly fitter than the input photo: clearer healthier skin, leaner or stronger body composition built from years of sustained training, mid-30s. Documentary realism, natural light, slightly tired but quietly satisfied expression. NOT a selfie, NOT flexing, NOT a mirror pose, NOT glossy Instagram fitspo or fitness-ad aesthetic — the unposed candid moment of someone who became this kind of person.',
   ],
   drifting: [
     // domain: travel / displacement / transit
@@ -111,6 +116,54 @@ export function momentCount(branch: Branch): number {
   return MOMENT_SCENES[branch].length;
 }
 
+// Sport keyword matchers, ordered by specificity. The first hit wins.
+// Each entry is the prose phrase Nano Banana receives — already shaped to
+// land as a candid documentary moment (mid- or post-activity, not a pose).
+const FITNESS_ACTIVITIES: { match: RegExp; phrase: string }[] = [
+  { match: /\b(climb(ing)?|boulder(ing)?|crag)\b/i,
+    phrase: 'rock climbing on a sun-warmed cliff face mid-route, hands chalked, eyes focused on the next hold' },
+  { match: /\b(cycl(e|ing)?|biking|gravel|peloton|road bike)\b/i,
+    phrase: 'cycling on a quiet tree-lined road at golden hour, hands light on the bars, breathing steady' },
+  { match: /\b(swim(ming)?|laps?|open water|pool)\b/i,
+    phrase: 'just stepping out of a clean morning lap pool, water still on the shoulders, towel folded over one arm' },
+  { match: /\b(surf(ing)?)\b/i,
+    phrase: 'walking back up the beach at dawn after a session, board under one arm, wet hair, salt on the skin' },
+  { match: /\b(lift(ing)?|powerlift|barbell|deadlift|squat|bench)\b/i,
+    phrase: 'finishing a clean barbell set in a no-frills sunlit gym, chalk on the hands, calm exhale, no mirror in frame' },
+  { match: /\b(yoga|pilates|mobility)\b/i,
+    phrase: 'mid-flow on a yoga mat in a sunlit room, breath visible, calm shoulders' },
+  { match: /\b(box(ing)?|martial|jiu[-\s]?jitsu|bjj|muay\s?thai|kickbox)\b/i,
+    phrase: 'wrapping their hands in a quiet boxing gym before a session, focused, calm' },
+  { match: /\b(ski(ing)?|snowboard(ing)?)\b/i,
+    phrase: 'pausing on a quiet ski slope at first chair, breath visible in cold morning air' },
+  { match: /\b(hik(e|ing)|trail|backpack)\b/i,
+    phrase: 'partway up a quiet forest trail at golden hour, walking poles in hand, easy breathing' },
+  { match: /\b(tennis|pickleball|badminton)\b/i,
+    phrase: 'mid-rally on an outdoor court in late-afternoon sunlight, racquet across the body, focused' },
+  { match: /\b(basketball|hoops|pickup game)\b/i,
+    phrase: 'mid-game on an outdoor court at sunset, dribbling once before a drive, focused' },
+  { match: /\b(soccer|football|fútbol|futsal)\b/i,
+    phrase: 'mid-stride chasing the ball on a city pitch under floodlights, shirt loose, focused' },
+  { match: /\b(row(ing)?|crew|erg)\b/i,
+    phrase: 'rowing a single scull on a glassy river at sunrise, steady catch, calm face' },
+  { match: /\b(dance|dancing|ballet|hip[-\s]?hop|salsa)\b/i,
+    phrase: 'mid-movement in a sunlit dance studio, in their own body, alive' },
+  { match: /\b(run(ning)?|jog(ging)?|marathon|5k|10k|trail run)\b/i,
+    phrase: 'running on a sunlit park path at sunrise, easy stride, healthy color in the cheeks' },
+];
+
+// Default = the user's request: a good-looking shot of them running in the park.
+const DEFAULT_FITNESS_ACTIVITY =
+  'running on a sunlit park path at sunrise, easy stride, healthy color in the cheeks, the look of someone who runs three or four times a week';
+
+function pickFitnessActivity(interests: string): string {
+  if (!interests) return DEFAULT_FITNESS_ACTIVITY;
+  for (const { match, phrase } of FITNESS_ACTIVITIES) {
+    if (match.test(interests)) return phrase;
+  }
+  return DEFAULT_FITNESS_ACTIVITY;
+}
+
 export async function generateFutureMomentAsset(opts: {
   selfieUrl: string;
   branch: Branch;
@@ -118,17 +171,27 @@ export async function generateFutureMomentAsset(opts: {
   interests: string;
   momentIndex: number;
 }): Promise<AgedPortraitAsset> {
-  const scene = MOMENT_SCENES[opts.branch][opts.momentIndex];
-  if (!scene) {
+  const rawScene = MOMENT_SCENES[opts.branch][opts.momentIndex];
+  if (!rawScene) {
     throw new Error(`Missing moment scene for ${opts.branch}.${opts.momentIndex}`);
   }
+
+  // Resolve the {ACTIVITY} placeholder used by the fitness slot. Once the
+  // activity is locked in, the generic "weave in interests" line gets
+  // suppressed so Nano Banana doesn't drag in an unrelated interest from
+  // the list and dilute the exercise framing.
+  const isFitnessSlot = rawScene.includes('{ACTIVITY}');
+  const scene = isFitnessSlot
+    ? rawScene.replace('{ACTIVITY}', pickFitnessActivity(opts.interests))
+    : rawScene;
 
   // Drop a small interest-flavored detail into the frame so each user's
   // moments feel personal: a specific cookbook on the counter, the band
   // poster on the wall, the kind of dog at their feet, the city they
   // actually love. Only weave in details that fit the scene naturally —
-  // never crowbar in everything from the list.
-  const interestsLine = opts.interests
+  // never crowbar in everything from the list. Skip on the fitness slot
+  // (the activity is already chosen specifically).
+  const interestsLine = !isFitnessSlot && opts.interests
     ? `Where it fits naturally, weave in ONE small specific detail from this person's actual world: ${opts.interests}. Do not crowd the frame; pick whatever quietly fits this scene.`
     : '';
 
