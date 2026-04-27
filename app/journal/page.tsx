@@ -114,8 +114,12 @@ export default async function JournalPage() {
         {/* LEFT: previous pages */}
         <aside className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ash">Previous Pages</p>
-            <p className="text-xs italic text-ash/60">
+            {/* Browser translate / annotation extensions inject attributes
+                like xt-marked="ok" onto plain text paragraphs in this region.
+                suppressHydrationWarning only covers one level, so add it on
+                each <p> the extension actually touches. */}
+            <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ash" suppressHydrationWarning>Previous Pages</p>
+            <p className="text-xs italic text-ash/60" suppressHydrationWarning>
               The room remembers in reverse.
             </p>
           </div>

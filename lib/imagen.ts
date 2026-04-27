@@ -37,8 +37,8 @@ const MOMENT_SCENES: Record<Branch, string[]> = {
     'the same person standing in front of a small attentive audience in a modern bright workspace, mid-sentence with one hand gesturing, a screen behind them showing their own work, fully in their element, alive and lit-up — the look of someone presenting something they actually built',
     // domain: deepened romantic partnership
     'the same person at a sunlit kitchen counter in the morning, leaning shoulder-to-shoulder with a partner, both reading something together on a tablet, two mugs of coffee, an unspectacular intimacy, a small private smile — the look of a relationship that grew up alongside them',
-    // domain: tangible accomplishment / finished work
-    'the same person sitting on a low couch in a softly lit apartment, holding a finished physical artifact of their work — a printed book with their name on the spine, or a framed product page — looking down at it with a quiet pride, no audience, no celebration, just the moment of seeing their own thing as a real object',
+    // domain: body / sustained training transformation
+    'the same person mid- or post-workout in natural light — could be running on an outdoor track at sunrise, cycling on a quiet road, climbing on real rock, finishing a set of pull-ups in a sun-lit gym, or stepping out of a pool — looking visibly fitter than the input photo: clearer healthier skin, leaner or stronger body composition built from years of sustained training, mid-30s. Documentary realism, natural light, slightly tired but quietly satisfied expression. NOT a gym selfie, NOT flexing, NOT mirror pose, NOT a glossy Instagram fitspo or fitness-ad aesthetic — the unposed candid moment of someone who became this kind of person',
   ],
   drifting: [
     // domain: travel / displacement / transit
